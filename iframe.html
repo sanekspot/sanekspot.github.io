@@ -1,0 +1,85 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<style type="text/css">
+    body {scrolling:no;
+}
+    iframe {position:absolute;
+    z-index:1;
+    top:0px;
+    left:0px;
+}
+</style>
+<script>
+
+// Commented resources are not on the critical path.
+var params = [
+  {
+    location : "http://mobile.lemonde.fr/planete/article/2016/12/21/forages-obama-sanctuarise-des-millions-d-hectares_5052173_3244.html",  // 0
+    preloads : {
+        style : [
+          "http://s1.lemde.fr/bootstrap/www/fdbd3a18f15a68d9fcdd0692c8d4cf15.css?m[]=mobile%2Fmain%40screen&m[]=marketing%2Fmeter%40screen&m[]=mobile%2Fmultimedia-embed%40screen&m[]=elections%2Famericaines%40screen&m[]=%2F%2Fasset.lemde.fr%2Fdata%2F0.11.3%2Fcss%2Fcadre-page%40screen",
+          "http://asset.lemde.fr/data/0.11.3/css/cadre-page.css"
+        ],
+        script : [
+          "http://s1.lemde.fr/conf.js",
+          "http://s1.lemde.fr/bootstrap/mobile/main.js",
+          "http://static.kameleoon.com/css/customers/r9u0567aww/0/kameleoon.js"
+        ]
+      }
+  }
+];
+
+// The current param is read from the hash parameter in the URL.
+var current_param = params[Number(window.location.hash.substr(1))];
+
+// Replaces the whole page by an iframe pointing to |location|.
+function updateframe(location) {
+  // Remove the buttons.
+  var button = document.getElementById("load_button");
+  button.parentNode.removeChild(button);
+  button = document.getElementById("preload_button");
+  button.parentNode.removeChild(button);
+  button = document.getElementById("preload_script_button");
+  button.parentNode.removeChild(button);
+  button = document.getElementById("both_button");
+  button.parentNode.removeChild(button);
+
+  // Add the iframe.
+  var iframe = document.createElement('iframe');
+  iframe.src = location;
+  iframe.width="100%";
+  iframe.height="100%";
+  document.body.appendChild(iframe);
+}
+
+function addpreloadlink(url, as) {
+  var link = document.createElement("link");
+  link.rel = "preload";
+  link.href = url;
+  link.as = as;
+  document.head.appendChild(link);
+}
+
+// Inserts link preloads in the page.
+function preloadbytype(preloads, type) {
+  for (var i = 0; i < preloads[type].length; i++) {
+    addpreloadlink(preloads[type][i], type);
+  }
+}
+
+function preload(preloads) {
+  for (var type in preloads) {
+    preloadbytype(preloads, type)
+  }
+}
+
+</script>
+</head>
+<body>
+  <button id="preload_button" onclick="preload(current_param.preloads)">Preload all</button>
+  <button id="preload_script_button" onclick="preloadbytype(current_param.preloads, 'script')">Preload scripts</button>
+  <button id="load_button" onclick="updateframe(current_param.location)">Load</button>
+  <button id="both_button" onclick="preload(current_param.preloads);updateframe(current_param.location)">Preload all + Load</button>
+</body>
+</html>
